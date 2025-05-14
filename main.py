@@ -5,6 +5,8 @@
 # Output: "Sunday"
 from datetime import datetime
 
+from log_functions import setup_logger, close_logger
+
 
 def get_day_of_week(date_str):
     """
@@ -32,6 +34,11 @@ def get_day_of_week(date_str):
 
 # Example usage
 if __name__ == "__main__":
+
+    # add a timestamp to the log file name
+    log_filename = f"mylog_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    logger = setup_logger(log_dir="logfiles", log_file=log_filename)
+
     date_input = "2023-10-01"
     day_of_week = get_day_of_week(date_input)
     print(f"The day of the week for {date_input} is {day_of_week}.")
