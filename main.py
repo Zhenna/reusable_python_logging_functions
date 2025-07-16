@@ -1,44 +1,50 @@
-# write a python function to convert an input date to day of the week
-# The function should take a date string in the format "YYYY-MM-DD" and return the day of the week
-# Example:
-# Input: "2023-10-01"
-# Output: "Sunday"
-from datetime import datetime
-
-from log_functions import setup_logger, close_logger
+import os
+import argparse
+from log_config import setup_logger, close_logger
+from just_another_script import get_day_of_week
 
 
-def get_day_of_week(date_str):
-    """
-    Convert a date string in the format "YYYY-MM-DD" to the day of the week.
+def parse_args(args=None):
+    parser = argparse.ArgumentParser(
+        description="Convert a date string (YYYY-MM-DD) to the day of the week."
+    )
 
-    Args:
-    date_str (str): The date string in the format "YYYY-MM-DD".
+    parser.add_argument(
+        "--date_input",
+        required=True,
+        type=str,
+        help="Date string in YYYY-MM-DD format.",
+    )
+    parser.add_argument(
+        "--log_filename",
+        required=False,
+        type=str,
+        default="my_logger",
+        help="The base filename for the log file (timestamp will be added).",
+    )
+    parser.add_argument(
+        "--log_dir",
+        required=False,
+        type=str,
+        default="logfiles",
+        help="Directory to save log files.",
+    )
 
-    Returns:
-    str: The day of the week.
-    """
-    try:
-        # Check if the input date string is in the correct format
-        datetime.strptime(date_str, "%Y-%m-%d")
-        # If the format is correct, proceed to convert the date string
-        # Parse the date string into a datetime object
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-    except ValueError:
-        # If the format is incorrect, raise an error
-        raise ValueError("Incorrect date format, should be YYYY-MM-DD")
-
-    # Get the day of the week as a string
-    return date_obj.strftime("%A")
+    return parser.parse_args(args)
 
 
-# Example usage
 if __name__ == "__main__":
+    args = parse_args()
 
-    # add a timestamp to the log file name
-    log_filename = f"mylog_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-    logger = setup_logger(log_dir="logfiles", log_file=log_filename)
+    logger = setup_logger(
+        log_dir=args.log_dir,
+        log_filename=args.log_filename,
+    )
 
-    date_input = "2023-10-01"
-    day_of_week = get_day_of_week(date_input)
-    print(f"The day of the week for {date_input} is {day_of_week}.")
+    day_of_week = get_day_of_week(args.date_input, logger)
+    if day_of_week:
+        logger.info(f"Result: {args.date_input} is a {day_of_week}.")
+    else:
+        logger.warning(f"Failed to determine day of week for input: {args.date_input}")
+
+    close_logger(logger)
